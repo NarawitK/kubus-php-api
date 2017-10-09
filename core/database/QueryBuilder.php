@@ -12,18 +12,23 @@ class QueryBuilder{
     $statement = $statement->FetchAll(PDO::FETCH_OBJ);
     return $statement = json_encode($statement);
   }
-  public function selectLocRecentTS($table){
+  public function sendLocAll($table){
     $statement = $this->pdo->prepare("SELECT DISTINCT * FROM {$table} ORDER BY timestamp DESC");
     $result = $statement->execute();
     $statement = $statement->FetchAll(PDO::FETCH_OBJ);
     return $statement = json_encode($statement);
 
   }
-  public function selectLocSpecific($table,$tramID){
+  public function sendLocByID($table,$tramID){
     $statement = $this->pdo->prepare("SELECT DISTINCT * FROM {$table} WHERE tramID = {$tramID} ORDER BY timestamp DESC");
     $result = $statement->execute();
     $statement = $statement->FetchAll(PDO::FETCH_OBJ);
     return $statement = json_encode($statement);
   }
+  //Define new Database jobs here
+  /*public function (){
+
+  }*/
+
 }
  ?>
