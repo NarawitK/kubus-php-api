@@ -1,7 +1,7 @@
 <?php
 return [
   'database' => [
-    'databaseName'=>"tramtrackerapp",//'New Database' ,
+    'databaseName'=>"kubus",//'New Database' ,
     'username'=>"root",//'' ,
     'password'=>"",//'' ,
     'connection'=>"mysql:host=127.0.0.1",//'mysql:host=127.0.0.1' ,

@@ -27,8 +27,24 @@ class QueryBuilder{
   }
   //Define new Database jobs here
   /*public function (){
-
   }*/
+  public function GetAllTramLocation($table){
+    $statement $this->pdo->prepare("SELECT DISTINCT * FROM {$location} ORDER BY timestamp DESC");
+    $result = $statement->execute();
+    $statement = $statement->FetchAll(PDO::FETCH_OBJ);
+    return $statement; 
+  }
 
-}
+  public function GetAllStation($table){
+    $statement $this->pdo->prepare("SELECT * FROM {$table} ORDER BY timestamp DESC");
+    $result = $statement->execute();
+    $statement = $statement->FetchAll(PDO::FETCH_OBJ);
+    return $statement; 
+  }
+  public function GetAllRouteRows($table){
+    $statement $this->pdo->prepare("SELECT * FROM {$table}");
+    $result = $statement->execute();
+    $statement = $statement->FetchAll(PDO::FETCH_OBJ);
+    return $statement; 
+  }
  ?>
