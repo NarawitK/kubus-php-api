@@ -9,9 +9,7 @@ else{
   $getCarID = $_GET["id"];
 }*/
 
-$table = "bus";
-
-$res = $app['database']->GetAllBus($table);
+$res = $app['database']->GetStationInRoute(1);
 header('Content-type:application/json');
 $json_str = json_encode($res);
 echo $json_str;
