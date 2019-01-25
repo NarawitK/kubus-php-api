@@ -89,7 +89,7 @@ class QueryBuilder{
   public function GetRouteColor($id_route){
     $querystring = "SELECT color FROM ".self::ROUTE_TABLE_NAME." WHERE id_route = {$id_route}";
     $result = $this->Query($querystring);
-    return $result; //Query Pass
+    return $result; //Query Pass. Maybe not needed.
   }
 
   //Waypoint

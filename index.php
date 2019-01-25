@@ -5,8 +5,6 @@
     <title></title>
   </head>
   <body>
-      <div id="txtHint">Customer info will be listed here...</div>
+      <div id="txtHint">Yo by Chompoo.</div>
   </body>
-  <script type="text/javascript" src="jquery-3.2.1.min.js"></script>
-  <script type="text/javascript" src="tramchecker.js"></script>
 </html>
