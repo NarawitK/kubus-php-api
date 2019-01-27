@@ -5,8 +5,8 @@ require '../core/JSONFunc.php';
 //Check GET Request
 ///Param Retrieve section
 try{
-  if( !isset($_GET["param"])){
-    $param = null; 
+  if(!isset($_GET["param"]) ){
+    $param = null;
   }
   else{
     $param = $_GET["param"];
@@ -65,7 +65,6 @@ try{
   echo $json;
 }
 catch(Exception $e){
-  $json = EncodeJSON(0);
-  echo $json;
+  return 0;
 }
 ?>

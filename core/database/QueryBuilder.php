@@ -21,7 +21,7 @@ class QueryBuilder{
       $statement = $statement->FetchAll(PDO::FETCH_ASSOC);
     }
     catch(Exception $e){
-      return $e->getMessage();
+      return 0;
     }
     return $statement;
   }
