@@ -1,6 +1,6 @@
 <?php
 require '../core/database/bootstrap.php';
-require '../core/JSONFunc.php';
+//require '../core/JSONFunc.php';
 
 //Check GET Request
 ///Param Retrieve section
@@ -34,7 +34,7 @@ try{
       $res = $app['database']->GetBusInRoute($param);
       break;
       case 3:
-      $res = $app['database']->GetAllRecentBusLocation($param);
+      $res = $app['database']->GetAllRecentBusLocation();
       break;
       case 4:
       $res = $app['database']->GetRecentBusLocationInRoute($param);
@@ -61,8 +61,9 @@ try{
       $res = 0;
       break;
   } 
-  $json = EncodeJSON($res);
-  echo $json;
+  //header('Content-type:application/json; charset=utf-8');
+  $res = json_encode($res);
+  echo $res;
 }
 catch(Exception $e){
   return 0;
