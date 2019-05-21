@@ -46,7 +46,7 @@ try{
       $res = $app['database']->GetAllStation();
       break;
       case 7:
-      $res = $app['database']->GetStationInRoute();
+      $res = $app['database']->GetStationInRoute($param);
       break;
       case 8:
       $res = $app['database']->GetAllRouteInfo();
