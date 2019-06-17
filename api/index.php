@@ -56,6 +56,8 @@ try{
       break;
       case 10:
       $res = $app['database']->GetWaypointInRoute($param);
+      case 11;
+      $res = $app['database']->GetWaypointAll();
       break;
       default:
       $res = 0;
