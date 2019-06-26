@@ -68,6 +68,6 @@ try{
   echo $res;
 }
 catch(Exception $e){
-  return 0;
+  return $e;
 }
 ?>

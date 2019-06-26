@@ -47,7 +47,7 @@ class QueryBuilder{
   //Mode 3
   public function GetAllRecentBusLocation(){
     //$querystring = "SELECT DISTINCT Bus_id,lat,lon,MAX(timestamp) as timestamp, color FROM ".self::BUSLOCATION_TABLE_NAME." GROUP BY Bus_id";
-    $querystring = "SELECT bus_id, b.plate, r.id as route_id, r.name as route_name, r.description, latitude, longitude, MAX(timestamp) as timestamp, color FROM ".self::BUSLOCATION_TABLE_NAME." as bl 
+    $querystring = "SELECT bus_id, step, b.plate, r.id as route_id, r.name as route_name, r.description, latitude, longitude, speed, MAX(timestamp) as timestamp, color FROM ".self::BUSLOCATION_TABLE_NAME." as bl 
                     INNER JOIN ".self::BUS_TABLE_NAME." as b on bl.bus_id = b.id
                     INNER JOIN ".self::ROUTE_TABLE_NAME." as r on b.route_id = r.id
                     GROUP BY bl.bus_id";
@@ -56,7 +56,7 @@ class QueryBuilder{
   }
   //Mode 4
   public function GetRecentBusLocationInRoute($route_id){
-    $querystring = "SELECT bus_id, b.plate, r.name as route_name, r.description, latitude, longitude, MAX(timestamp) as timestamp, color FROM ".self::BUSLOCATION_TABLE_NAME." as bl 
+    $querystring = "SELECT bus_id, step, b.plate, r.name as route_name, r.description, latitude, longitude, speed, MAX(timestamp) as timestamp, color FROM ".self::BUSLOCATION_TABLE_NAME." as bl 
                     INNER JOIN ".self::BUS_TABLE_NAME." as b on bl.bus_id = b.id
                     INNER JOIN ".self::ROUTE_TABLE_NAME." as r on b.route_id = r.id
                     WHERE r.id = {$route_id} GROUP BY bl.bus_id";
