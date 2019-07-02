@@ -1,7 +1,5 @@
 <?php
 require '../core/database/bootstrap.php';
-//require '../core/JSONFunc.php';
-
 //Check GET Request
 ///Param Retrieve section
 try{
@@ -21,7 +19,7 @@ try{
   }
 }//end try
 catch(Exception $e){
-  return 0;
+  echo $e;
 }//end catch
 
 ///Switch query result by $queryMode
@@ -56,6 +54,7 @@ try{
       break;
       case 10:
       $res = $app['database']->GetWaypointInRoute($param);
+      break;
       case 11;
       $res = $app['database']->GetWaypointAll();
       break;
@@ -68,6 +67,6 @@ try{
   echo $res;
 }
 catch(Exception $e){
-  return $e;
+  echo $e;
 }
 ?>

@@ -13,7 +13,7 @@ try{
   $app['database'] = new QueryBuilder(DBConnect::makeCon($app['config']['database']));
 }
 catch(Exception $e){
-  echo $e;
+  echo $e->getMessage();
 }
 
 ?>
