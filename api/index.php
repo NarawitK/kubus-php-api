@@ -1,7 +1,7 @@
 <?php
 require '../core/database/bootstrap.php';
 //Check GET Request
-///Param Retrieve section
+
 try{
   if(!isset($_GET["param"]) ){
     $param = null;
@@ -9,18 +9,18 @@ try{
   else{
     $param = $_GET["param"];
   }
-
-///Check querymode request in $_GET[]
+//Check querymode request in $_GET[]
   if(!isset($_GET["mode"])){
-    return 0;
+    throw new Error("Mode not assigned");
   }
   else{
     $queryMode = $_GET["mode"];
   }
-}//end try
+}
+
 catch(Exception $e){
   echo $e;
-}//end catch
+}
 
 ///Switch query result by $queryMode
 try{
@@ -50,7 +50,7 @@ try{
       $res = $app['database']->GetAllRouteInfo();
       break;
       case 9:
-      $res = $app['database']->GetRouteColor($param);
+      $res = $app['database']->GetSomeRouteInfoByID($param);
       break;
       case 10:
       $res = $app['database']->GetWaypointInRoute($param);
@@ -58,11 +58,17 @@ try{
       case 11;
       $res = $app['database']->GetWaypointAll();
       break;
+      case 12:
+      $res = $app['database']->GetRouteInStation($param);
+      break;
+      case 13:
+      $res = $app['database']->GetRouteAndStationDataForQRCode($param);
+      break;
       default:
-      $res = 0;
+      throw new Error("Requestmode is invalid");
       break;
   } 
-  //header('Content-type:application/json; charset=utf-8');
+  header('Content-type:application/json; charset=utf-8');
   $res = json_encode($res);
   echo $res;
 }
