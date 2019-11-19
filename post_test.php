@@ -23,7 +23,7 @@ $context = stream_context_create(array(
 ));
 
 // Send the request
-$response = file_get_contents('http://localhost/kubus/api/post.php', FALSE, $context);
+$response = file_get_contents('http://localhost/kubus/api/bus_post.php', FALSE, $context);
 
 if($response === FALSE){
     die('Error');

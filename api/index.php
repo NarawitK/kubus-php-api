@@ -65,7 +65,7 @@ try{
       $res = $app['database']->GetRouteAndStationDataForQRCode($param);
       break;
       default:
-      throw new Error("Requestmode is invalid");
+      throw new Error("Requestmode or parameter is invalid");
       break;
   } 
   header('Content-type:application/json; charset=utf-8');

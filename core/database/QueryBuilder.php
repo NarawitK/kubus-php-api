@@ -47,16 +47,16 @@ class QueryBuilder{
     return $statement;
   }
 
-  
-
-  private function Update($querystring){
+  private function GetRowCount($querystring){
     try{
       $statement = $this->pdo->prepare($querystring);
-      $result = $statement->execute();
+      $statement->execute();
+      $rowCount = $statement->rowCount();
     }
     catch(Exception $e){
       return $e;
     }
+    return $rowCount;
   }
   //Define new Database jobs here
   //Below is use for KUBUS Query.
@@ -79,11 +79,10 @@ class QueryBuilder{
   //Bus Location
   //Mode 3
   public function GetAllRecentBusLocation(){
-    //$querystring = "SELECT DISTINCT Bus_id,lat,lon,MAX(timestamp) as timestamp, color FROM ".self::BUSLOCATION_TABLE_NAME." GROUP BY Bus_id";
-    $querystring = "SELECT bus_id, step, b.plate, r.id as route_id, r.name as route_name, r.description, is_active, latitude, longitude, speed, MAX(timestamp) as timestamp, color FROM ".self::BUSLOCATION_TABLE_NAME." bl 
-                    INNER JOIN ".self::BUS_TABLE_NAME." b on bl.bus_id = b.id
+    $querystring = "SELECT bus_id, step, b.plate, r.id as route_id, r.name as route_name, r.description, is_active, latitude, longitude, speed, timestamp, color FROM ".self::BUSLOCATION_TABLE_NAME." bl
+                      INNER JOIN ".self::BUS_TABLE_NAME." b on bl.bus_id = b.id
                     INNER JOIN ".self::ROUTE_TABLE_NAME." r on b.route_id = r.id
-                    WHERE status = 1
+                    WHERE status = 1 AND timestamp = (SELECT MAX(timestamp) FROM ".self::BUSLOCATION_TABLE_NAME." bl2 WHERE bl.bus_id = bl2.bus_id)
                     GROUP BY bus_id,step,b.plate,is_active,latitude,longitude,speed";
     $result = $this->Query($querystring);
     return $result; //Query PASS
@@ -114,8 +113,9 @@ class QueryBuilder{
     $querystring = "SELECT bus_id, step, b.plate, r.id as route_id, r.name as route_name, r.description, is_active,latitude, longitude, speed, MAX(timestamp) as timestamp, color FROM ".self::BUSLOCATION_TABLE_NAME." bl 
                     INNER JOIN ".self::BUS_TABLE_NAME."  b on bl.bus_id = b.id
                     INNER JOIN ".self::ROUTE_TABLE_NAME." r on b.route_id = r.id
-                    WHERE r.id IN ({$routes}) AND status = 1 
-                    GROUP BY bus_id,step,b.plate,is_active,latitude,longitude,speed,timestamp";
+                    WHERE r.id IN ({$routes}) AND status = 1 AND timestamp = (SELECT MAX(timestamp) FROM ".self::BUSLOCATION_TABLE_NAME." bl2 WHERE bl.bus_id = bl2.bus_id)
+                    GROUP BY bus_id,step,b.plate,is_active,latitude,longitude,speed,timestamp
+                    ";
     $result = $this->Query($querystring);
     return $result; //Query Pass
   }
@@ -126,6 +126,19 @@ class QueryBuilder{
                     GROUP BY bus_id,latitude,longitude LIMIT 1";
     $result = $this->Query($querystring);
     return $result; //Query PASS
+  }
+
+  //Mode FnTest
+  private function CheckBusLocationExist($bus_id){
+    $querystring = "SELECT bus_id FROM ".self::BUSLOCATION_TABLE_NAME." WHERE bus_id = {$bus_id} LIMIT 1";
+    //$result = $this->pdo->prepare($querystring);
+    $result = $this->GetRowCount($querystring);
+    if($result){
+      return true;
+    }
+    else{
+      return false;
+    }
   }
 
   //Station
@@ -217,22 +230,45 @@ class QueryBuilder{
 
     //POST: Insert/Update Car Function
     public function UpdateBusData($data){
+      /*
+      * Former Query
       $stations = self::GetWaypointAll();
       $compare_result = CompareDistances($data,$stations);
       $querystring = "UPDATE hw_test 
                       SET latitude = {$data->latitude}, longitude = {$data->longitude}, step = {$compare_result["closest_station"]->step}, is_active = 1, speed = {$data->speed}
                       WHERE bus_id = {$data->bus_id}";
-      $result = $this->SingleQuery($querystring);
+      */
+      $carDataExist = CheckBusLocationExist($data->bus_id);
+      if($carDataExist){
+        $result = $this->UpdateBusDataQuery($data);
+      }
+      else{
+        $result = $this->InsertBusDataQuery($data);
+      }
       return $result;
     }
     
-    public function InsertBusData($data){
+    private function InsertBusDataQuery($data){
+      /*
+      * Former Query
       $stations = self::GetWaypointAll();
       $compare_result = CompareDistances($data,$stations);
       $querystring = "INSERT INTO hw_test (bus_id,latitude,longitude,step,speed,course,is_active)
       VALUES ({$data->bus_id},{$data->latitude},{$data->longitude},{$compare_result["closest"]->step},{$data->speed},{$data->course},1)";
+      *
+      */
+      $querystring = "INSERT INTO hw_test (bus_id,latitude,longitude,speed,course,is_active)
+      VALUES ({$data->bus_id},{$data->latitude},{$data->longitude},{$data->speed},{$data->course},1)";
       $result = $this->SingleQuery($querystring);
       return $result;
+    }
+    private function UpdateBusDataQuery($data){
+      $querystring = "UPDATE hw_test 
+                      SET latitude = {$data->latitude}, longitude = {$data->longitude}, is_active = 1, speed = {$data->speed}
+                      WHERE bus_id = {$data->bus_id}";
+      $result = $this->SingleQuery($querystring);
+      return $result;
+      
     }
 }
  ?>

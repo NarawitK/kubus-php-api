@@ -9,7 +9,7 @@ require '../core/database/bootstrap.php';
 try{
   switch($postmode){
     case "p1":
-      $result = $app['database']->InsertBusData($data);
+      $result = $app['database']->UpdateBusData($data);
       var_dump($result);
       break;
     default:
