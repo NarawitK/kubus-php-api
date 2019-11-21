@@ -35,6 +35,17 @@ class QueryBuilder{
     return $statement;
   }
 
+  private function NonFetchQuery($querystring){
+    try{
+      $statement = $this->pdo->prepare($querystring);
+      $result = $statement->execute();
+    }
+    catch(PDOException $e){
+      return $e;
+    }
+    return $result;
+  }
+
   private function SingleQuery($querystring){
     try{
       $statement = $this->pdo->prepare($querystring);
@@ -127,20 +138,7 @@ class QueryBuilder{
     $result = $this->Query($querystring);
     return $result; //Query PASS
   }
-
-  //Mode FnTest
-  private function CheckBusLocationExist($bus_id){
-    $querystring = "SELECT bus_id FROM ".self::BUSLOCATION_TABLE_NAME." WHERE bus_id = {$bus_id} LIMIT 1";
-    //$result = $this->pdo->prepare($querystring);
-    $result = $this->GetRowCount($querystring);
-    if($result){
-      return true;
-    }
-    else{
-      return false;
-    }
-  }
-
+  
   //Station
   //Mode 6
   public function GetAllStation(){
@@ -148,13 +146,13 @@ class QueryBuilder{
     $result = $this->Query($querystring);
     return $result; //Query Pass (Mod Route Later)
   }
-
+  
   //Mode 7
   public function GetStationInRoute($route_id){ //Mode
     $querystring = "SELECT wp.station_id, wp.step, wp.route_id, r.name as route_name, r.description as route_description, s.name as station_name, s.latitude, s.longitude FROM ".self::WAYPOINT_TABLE_NAME." as wp
-                    INNER JOIN ".self::ROUTE_TABLE_NAME." as r ON wp.route_id = r.id
-                    INNER JOIN ".self::STATION_TABLE_NAME." as s ON wp.station_id = s.id
-                    WHERE route_id = {$route_id} ORDER BY wp.step";
+    INNER JOIN ".self::ROUTE_TABLE_NAME." as r ON wp.route_id = r.id
+    INNER JOIN ".self::STATION_TABLE_NAME." as s ON wp.station_id = s.id
+    WHERE route_id = {$route_id} ORDER BY wp.step";
     $result = $this->Query($querystring);
     return $result; //Query Pass
   }
@@ -166,53 +164,53 @@ class QueryBuilder{
     $result = $this->Query($querystring);
     return $result; //Query Pass
   }
-
+  
   //Mode 9
   public function GetSomeRouteInfoByID($route_id){
     $querystring = "SELECT id, name, description FROM ".self::ROUTE_TABLE_NAME." WHERE id = {$route_id}";
     $result = $this->SingleQuery($querystring);
     return $result; //Query Pass.
   }
-
+  
   //Waypoint
   //Mode 10
   public function GetWaypointInRoute($route_id){
-  $querystring = "SELECT step,station_id,wp.route_id,r.name as route_name,r.description as route_description,s.name as station_name,s.latitude,s.longitude FROM ".self::WAYPOINT_TABLE_NAME." as wp
-                  INNER JOIN ".self::ROUTE_TABLE_NAME." as r ON wp.route_id = r.id
-                  INNER JOIN ".self::STATION_TABLE_NAME." as s ON wp.station_id = s.id
-                  WHERE route_id = {$route_id} ORDER BY step";
+    $querystring = "SELECT step,station_id,wp.route_id,r.name as route_name,r.description as route_description,s.name as station_name,s.latitude,s.longitude FROM ".self::WAYPOINT_TABLE_NAME." as wp
+    INNER JOIN ".self::ROUTE_TABLE_NAME." as r ON wp.route_id = r.id
+    INNER JOIN ".self::STATION_TABLE_NAME." as s ON wp.station_id = s.id
+    WHERE route_id = {$route_id} ORDER BY step";
     $result = $this->Query($querystring);
     return $result; //PASS
   }
   //Mode 11
   public function GetWaypointAll(){
     $querystring = "SELECT step,station_id,route_id,r.name as route_name,r.description as route_description,s.name as station_name,s.latitude,s.longitude FROM ".self::WAYPOINT_TABLE_NAME." as wp
-                    INNER JOIN ".self::ROUTE_TABLE_NAME." as r ON wp.route_id = r.id
-                    INNER JOIN ".self::STATION_TABLE_NAME." as s ON wp.station_id = s.id
-                    ORDER BY route_id, step";
-      $result = $this->Query($querystring);
-      return $result; //PASS
-    }
-
-    //Mode 12
-    public function GetRouteInStation($station_id){
+    INNER JOIN ".self::ROUTE_TABLE_NAME." as r ON wp.route_id = r.id
+    INNER JOIN ".self::STATION_TABLE_NAME." as s ON wp.station_id = s.id
+    ORDER BY route_id, step";
+    $result = $this->Query($querystring);
+    return $result; //PASS
+  }
+  
+  //Mode 12
+  public function GetRouteInStation($station_id){
       $querystring = "select distinct r.id as routeID, r.name as routeName, r.description as routeDescription from ".self::WAYPOINT_TABLE_NAME." as wp
-                      inner join ".self::ROUTE_TABLE_NAME." as r on wp.route_id = r.id
-                      inner join ".self::STATION_TABLE_NAME." as s on wp.station_id = s.id
-                      where s.id = {$station_id}
-                      order by r.id";
+      inner join ".self::ROUTE_TABLE_NAME." as r on wp.route_id = r.id
+      inner join ".self::STATION_TABLE_NAME." as s on wp.station_id = s.id
+      where s.id = {$station_id}
+      order by r.id";
       $result = $this->Query($querystring);
       return $result; //
     }
-
+    
     //Mode 13
     public function GetRouteAndStationDataForQRCode($station_id){
       $querystring = "select distinct r.id as routeID, r.name as routeName, r.description as routeDescription, s.id as stationID, s.name as stationName, s.latitude, s.longitude 
-                      from ".self::WAYPOINT_TABLE_NAME." as wp
-                      inner join ".self::ROUTE_TABLE_NAME." as r on wp.route_id = r.id
-                      inner join ".self::STATION_TABLE_NAME." as s on wp.station_id = s.id
-                      where s.id = {$station_id}
-                      order by r.id";
+      from ".self::WAYPOINT_TABLE_NAME." as wp
+      inner join ".self::ROUTE_TABLE_NAME." as r on wp.route_id = r.id
+      inner join ".self::STATION_TABLE_NAME." as s on wp.station_id = s.id
+      where s.id = {$station_id}
+      order by r.id";
       $result = $this->Query($querystring);
       return $result;
     }
@@ -227,48 +225,67 @@ class QueryBuilder{
       array_unshift($result,$object); 
       return $result;
     }
-
+    
     //POST: Insert/Update Car Function
     public function UpdateBusData($data){
-      /*
-      * Former Query
-      $stations = self::GetWaypointAll();
-      $compare_result = CompareDistances($data,$stations);
-      $querystring = "UPDATE hw_test 
-                      SET latitude = {$data->latitude}, longitude = {$data->longitude}, step = {$compare_result["closest_station"]->step}, is_active = 1, speed = {$data->speed}
-                      WHERE bus_id = {$data->bus_id}";
-      */
-      $carDataExist = CheckBusLocationExist($data->bus_id);
-      if($carDataExist){
-        $result = $this->UpdateBusDataQuery($data);
+      $isBusExist = $this->CheckBusExist($data->bus_id);
+      echo("isBusExist".$isBusExist);
+      if($isBusExist){
+        $isBusLocationExist = $this->CheckBusLocationExist($data->bus_id);
+        echo("isBusLocationExist".$isBusLocationExist);
+        if($isBusLocationExist){
+          echo('Go Update');
+          $result = $this->UpdateBusDataQuery($data); 
+        }
+        else{
+          echo('Go Insert');
+          $result = $this->InsertBusDataQuery($data);
+        }
+        return $result;
       }
       else{
-        $result = $this->InsertBusDataQuery($data);
+        throw new Error("Bus not exist in system.");
       }
-      return $result;
     }
     
     private function InsertBusDataQuery($data){
-      /*
-      * Former Query
-      $stations = self::GetWaypointAll();
-      $compare_result = CompareDistances($data,$stations);
-      $querystring = "INSERT INTO hw_test (bus_id,latitude,longitude,step,speed,course,is_active)
-      VALUES ({$data->bus_id},{$data->latitude},{$data->longitude},{$compare_result["closest"]->step},{$data->speed},{$data->course},1)";
-      *
-      */
       $querystring = "INSERT INTO hw_test (bus_id,latitude,longitude,speed,course,is_active)
       VALUES ({$data->bus_id},{$data->latitude},{$data->longitude},{$data->speed},{$data->course},1)";
-      $result = $this->SingleQuery($querystring);
+      $result = $this->NonFetchQuery($querystring);
       return $result;
     }
     private function UpdateBusDataQuery($data){
       $querystring = "UPDATE hw_test 
-                      SET latitude = {$data->latitude}, longitude = {$data->longitude}, is_active = 1, speed = {$data->speed}
+                      SET latitude = {$data->latitude}, longitude = {$data->longitude}, is_active = 1, speed = {$data->speed}, course ={$data->course}
                       WHERE bus_id = {$data->bus_id}";
-      $result = $this->SingleQuery($querystring);
+      $result = $this->NonFetchQuery($querystring);
       return $result;
       
     }
-}
- ?>
+    //Mode FnTest
+    private function CheckBusExist($bus_id){
+      $querystring = "SELECT id FROM ".self::BUS_TABLE_NAME." 
+      WHERE id = {$bus_id} LIMIT 1";
+      $result = $this->GetRowCount($querystring);
+      if($result){
+        return true;
+      }
+      else{
+        return false;
+      }
+    }
+  
+    private function CheckBusLocationExist($bus_id){
+      $querystring = "SELECT bus_id FROM ".self::BUSLOCATION_TABLE_NAME."
+                      WHERE bus_id = {$bus_id} LIMIT 1";
+      $result = $this->GetRowCount($querystring);
+      if($result){
+        return true;
+      }
+      else{
+        return false;
+      }
+    }
+  }
+  
+  ?>

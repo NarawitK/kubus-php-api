@@ -3,11 +3,11 @@ include_once "./core/database/calcdist.php";
 require './core/database/bootstrap.php';
 
 $post_data->postmode = "p1";
-$post_data->bus_id = 3;
-$post_data->latitude = 14.028336;
-$post_data->longitude = 99.983968;
-$post_data->speed = 60.01;
-$post_data->course = 0.00;
+$post_data->bus_id = 98;
+$post_data->latitude = 14.00666;
+$post_data->longitude = 99.97719;
+$post_data->speed = 200.01;
+$post_data->course = 5822;
 $encode_postdata = json_encode($post_data);
 
 $data = json_decode($encode_postdata);
