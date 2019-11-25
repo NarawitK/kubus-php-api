@@ -238,13 +238,13 @@ class QueryBuilder{
     }
     
     private function InsertBusDataQuery($data){
-      $querystring = "INSERT INTO hw_test (bus_id,latitude,longitude,speed,course,is_active)
+      $querystring = "INSERT INTO ".self::BUSLOCATION_TABLE_NAME." (bus_id,latitude,longitude,speed,course,is_active)
       VALUES ({$data->bus_id},{$data->latitude},{$data->longitude},{$data->speed},{$data->course},1)";
       $result = $this->NonFetchQuery($querystring);
       return $result;
     }
     private function UpdateBusDataQuery($data){
-      $querystring = "UPDATE hw_test 
+      $querystring = "UPDATE ".self::BUSLOCATION_TABLE_NAME." 
                       SET latitude = {$data->latitude}, longitude = {$data->longitude}, is_active = 1, speed = {$data->speed}, course ={$data->course}
                       WHERE bus_id = {$data->bus_id}";
       $result = $this->NonFetchQuery($querystring);
