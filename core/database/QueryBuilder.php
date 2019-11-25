@@ -94,7 +94,7 @@ class QueryBuilder{
                       INNER JOIN ".self::BUS_TABLE_NAME." b on bl.bus_id = b.id
                     INNER JOIN ".self::ROUTE_TABLE_NAME." r on b.route_id = r.id
                     WHERE status = 1 AND timestamp = (SELECT MAX(timestamp) FROM ".self::BUSLOCATION_TABLE_NAME." bl2 WHERE bl.bus_id = bl2.bus_id)
-                    GROUP BY bus_id,step,b.plate,is_active,latitude,longitude,speed";
+                    GROUP BY bus_id,step,b.plate,is_active,latitude,longitude,speed,timestamp";
     $result = $this->Query($querystring);
     return $result; //Query PASS
   }
@@ -148,7 +148,7 @@ class QueryBuilder{
   }
   
   //Mode 7
-  public function GetStationInRoute($route_id){ //Mode
+  public function GetStationInRoute($route_id){
     $querystring = "SELECT wp.station_id, wp.step, wp.route_id, r.name as route_name, r.description as route_description, s.name as station_name, s.latitude, s.longitude FROM ".self::WAYPOINT_TABLE_NAME." as wp
     INNER JOIN ".self::ROUTE_TABLE_NAME." as r ON wp.route_id = r.id
     INNER JOIN ".self::STATION_TABLE_NAME." as s ON wp.station_id = s.id
@@ -212,17 +212,6 @@ class QueryBuilder{
       where s.id = {$station_id}
       order by r.id";
       $result = $this->Query($querystring);
-      return $result;
-    }
-    //Mode 20
-    public function GetStationForArduino($route_id){
-      $querystring  = "SELECT step,station_id,route_id,s.latitude,s.longitude FROM ".self::WAYPOINT_TABLE_NAME." as wp
-      INNER JOIN ".self::ROUTE_TABLE_NAME." as r ON wp.route_id = r.id
-      INNER JOIN ".self::STATION_TABLE_NAME." as s ON wp.station_id = s.id
-      WHERE route_id = {$route_id} ORDER BY route_id";
-      $result = $this->Query($querystring);
-      $object = (object)["array_count"=> count($result)];
-      array_unshift($result,$object); 
       return $result;
     }
     
