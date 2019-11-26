@@ -1,6 +1,4 @@
 <?php
-require_once "calcdist.php";
-
 class QueryBuilder{
   protected $pdo;
   //Table Name
@@ -8,12 +6,14 @@ class QueryBuilder{
   PHP 7.1+ we can specify the visibility of class constants.
   private const BUS_TABLE_NAME = "bus";
   private const BUSLOCATION_TABLE_NAME = "bus_location";
+  private const BUSINROUTE_TABLE_NAME = "bus_in_route";
   private const ROUTE_TABLE_NAME = "route";
   private const STATION_TABLE_NAME = "station";
   private const WAYPOINT_TABLE_NAME = "waypoint";
   */
   const BUS_TABLE_NAME = "bus";
   const BUSLOCATION_TABLE_NAME = "bus_location";
+  const BUSINROUTE_TABLE_NAME = "bus_in_route";
   const ROUTE_TABLE_NAME = "route";
   const STATION_TABLE_NAME = "station";
   const WAYPOINT_TABLE_NAME = "waypoint";
@@ -82,7 +82,11 @@ class QueryBuilder{
 
   //Mode 2
   public function GetBusInRoute($route_id){
-    $querystring = "SELECT * FROM ".self::BUS_TABLE_NAME." WHERE route_id = {$route_id} ";
+    $querystring = "SELECT b.id AS busID, plate, status, details FROM ".self::BUS_TABLE_NAME." b
+INNER JOIN ".self::BUSINROUTE_TABLE_NAME." bir ON b.id = bir.bus_id
+INNER JOIN ".self::ROUTE_TABLE_NAME." r ON bir.route_id = r.id
+WHERE bir.route_id = {$route_id}
+ORDER BY b.id";
     $result = $this->Query($querystring);
     return $result; //Query PASS
   }
@@ -90,51 +94,31 @@ class QueryBuilder{
   //Bus Location
   //Mode 3
   public function GetAllRecentBusLocation(){
-    $querystring = "SELECT bus_id, step, b.plate, r.id as route_id, r.name as route_name, r.description, is_active, latitude, longitude, speed, timestamp, color FROM ".self::BUSLOCATION_TABLE_NAME." bl
-                      INNER JOIN ".self::BUS_TABLE_NAME." b on bl.bus_id = b.id
-                    INNER JOIN ".self::ROUTE_TABLE_NAME." r on b.route_id = r.id
-                    WHERE status = 1 AND timestamp = (SELECT MAX(timestamp) FROM ".self::BUSLOCATION_TABLE_NAME." bl2 WHERE bl.bus_id = bl2.bus_id)
-                    GROUP BY bus_id,step,b.plate,is_active,latitude,longitude,speed,timestamp";
+    $querystring = "SELECT bir.bus_id, bir.route_id, r.name as route_name, r.description, b.plate, bl.is_active, bl.latitude, bl.longitude, bl.speed, bl.timestamp, r.color  FROM ".self::BUSINROUTE_TABLE_NAME." bir
+INNER JOIN ".self::BUS_TABLE_NAME." b ON b.id = bir.bus_id
+INNER JOIN ".self::ROUTE_TABLE_NAME." r ON r.id = bir.route_id
+INNER JOIN ".self::BUSLOCATION_TABLE_NAME." bl ON b.id = bl.bus_id
+WHERE status = 1 AND timestamp = (SELECT MAX(timestamp) FROM ".self::BUSLOCATION_TABLE_NAME." bl2 WHERE bl.bus_id = bl2.bus_id)
+ORDER BY bir.bus_id,bir.route_id";
     $result = $this->Query($querystring);
     return $result; //Query PASS
   }
-
-  protected function routeIterator($collection){
-    $routes = "";
-    for($i=0; $i < count($collection); $i++){
-      if($i === count($collection)-1){
-        $routes .= (string)$collection[$i];
-      }
-      else{
-        $routes .= ",".(string)$collection[$i];
-      }
-    }
-    return $routes;
-  }
   //Mode 4
   public function GetRecentBusLocationInRoute($route_id){
-    $routes = null;
-    if(is_array($route_id)){
-      $IteratedRoute = self::routeIterator($route_id);
-      $routes = $IteratedRoute;
-    }
-    else{
-      $routes = $route_id;
-    }
-    $querystring = "SELECT bus_id, step, b.plate, r.id as route_id, r.name as route_name, r.description, is_active,latitude, longitude, speed, MAX(timestamp) as timestamp, color FROM ".self::BUSLOCATION_TABLE_NAME." bl 
-                    INNER JOIN ".self::BUS_TABLE_NAME."  b on bl.bus_id = b.id
-                    INNER JOIN ".self::ROUTE_TABLE_NAME." r on b.route_id = r.id
-                    WHERE r.id IN ({$routes}) AND status = 1 AND timestamp = (SELECT MAX(timestamp) FROM ".self::BUSLOCATION_TABLE_NAME." bl2 WHERE bl.bus_id = bl2.bus_id)
-                    GROUP BY bus_id,step,b.plate,is_active,latitude,longitude,speed,timestamp
-                    ";
+    $querystring = "SELECT bir.bus_id, bir.route_id, r.name as route_name, r.description, b.plate, bl.is_active, bl.latitude, bl.longitude, bl.speed, bl.timestamp, r.color  FROM ".self::BUSINROUTE_TABLE_NAME." bir
+INNER JOIN ".self::BUS_TABLE_NAME." b ON b.id = bir.bus_id
+INNER JOIN ".self::ROUTE_TABLE_NAME." r ON r.id = bir.route_id
+INNER JOIN ".self::BUSLOCATION_TABLE_NAME." bl ON b.id = bl.bus_id
+WHERE r.id = {$route_id} AND b.status = 1 AND timestamp = (SELECT MAX(timestamp) FROM ".self::BUSLOCATION_TABLE_NAME." bl2 WHERE bl.bus_id = bl2.bus_id)
+ORDER BY bir.bus_id";
     $result = $this->Query($querystring);
     return $result; //Query Pass
   }
   //Mode 5
   public function GetSpecificBusLocation($bus_id){
-    $querystring = "SELECT DISTINCT bus_id,latitude,longitude,MAX(timestamp) as timestamp FROM ".self::BUSLOCATION_TABLE_NAME." 
-                    WHERE bus_id = {$bus_id}
-                    GROUP BY bus_id,latitude,longitude LIMIT 1";
+    $querystring = "SELECT bus_id,latitude,longitude,timestamp FROM ".self::BUSLOCATION_TABLE_NAME." bl1 
+                    WHERE bus_id = {$bus_id} AND timestamp = (SELECT MAX(timestamp) FROM ".self::BUSLOCATION_TABLE_NAME." bl2 WHERE bl1.bus_id = bl2.bus_id)
+                    LIMIT 1";
     $result = $this->Query($querystring);
     return $result; //Query PASS
   }
@@ -189,28 +173,28 @@ class QueryBuilder{
     INNER JOIN ".self::STATION_TABLE_NAME." as s ON wp.station_id = s.id
     ORDER BY route_id, step";
     $result = $this->Query($querystring);
-    return $result; //PASS
+    return $result;
   }
   
   //Mode 12
   public function GetRouteInStation($station_id){
-      $querystring = "select distinct r.id as routeID, r.name as routeName, r.description as routeDescription from ".self::WAYPOINT_TABLE_NAME." as wp
-      inner join ".self::ROUTE_TABLE_NAME." as r on wp.route_id = r.id
-      inner join ".self::STATION_TABLE_NAME." as s on wp.station_id = s.id
-      where s.id = {$station_id}
-      order by r.id";
+      $querystring = "SELECT DISTINCT r.id as routeID, r.name as routeName, r.description as routeDescription FROM ".self::WAYPOINT_TABLE_NAME." as wp
+      INNER JOIN ".self::ROUTE_TABLE_NAME." as r ON wp.route_id = r.id
+      INNER JOIN ".self::STATION_TABLE_NAME." as s ON wp.station_id = s.id
+      WHERE s.id = {$station_id}
+      ORDER by r.id";
       $result = $this->Query($querystring);
-      return $result; //
+      return $result;
     }
     
     //Mode 13
     public function GetRouteAndStationDataForQRCode($station_id){
-      $querystring = "select distinct r.id as routeID, r.name as routeName, r.description as routeDescription, s.id as stationID, s.name as stationName, s.latitude, s.longitude 
-      from ".self::WAYPOINT_TABLE_NAME." as wp
-      inner join ".self::ROUTE_TABLE_NAME." as r on wp.route_id = r.id
-      inner join ".self::STATION_TABLE_NAME." as s on wp.station_id = s.id
-      where s.id = {$station_id}
-      order by r.id";
+      $querystring = "SELECT DISTINCT r.id AS routeID, r.name AS routeName, r.description AS routeDescription, s.id AS stationID, s.name AS stationName, s.latitude, s.longitude 
+      FROM ".self::WAYPOINT_TABLE_NAME." AS wp
+      INNER JOIN ".self::ROUTE_TABLE_NAME." AS r ON wp.route_id = r.id
+      INNER JOIN ".self::STATION_TABLE_NAME." AS s ON wp.station_id = s.id
+      WHERE s.id = {$station_id}
+      ORDER BY r.id";
       $result = $this->Query($querystring);
       return $result;
     }
@@ -276,5 +260,4 @@ class QueryBuilder{
       }
     }
   }
-  
   ?>
