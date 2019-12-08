@@ -1,7 +1,6 @@
 <?php
 class QueryBuilder{
   protected $pdo;
-  //Table Name
   /*
   PHP 7.1+ we can specify the visibility of class constants.
   private const BUS_TABLE_NAME = "bus";
@@ -105,7 +104,7 @@ ORDER BY bir.bus_id,bir.route_id";
   }
   //Mode 4
   public function GetRecentBusLocationInRoute($route_id){
-    $querystring = "SELECT bir.bus_id, bir.route_id, r.name as route_name, r.description, b.plate, bl.is_active, bl.latitude, bl.longitude, bl.speed, bl.timestamp, r.color  FROM ".self::BUSINROUTE_TABLE_NAME." bir
+    $querystring = "SELECT bir.bus_id, bir.route_id, step,  r.name as route_name, r.description, b.plate, bl.is_active, bl.latitude, bl.longitude, bl.speed, bl.timestamp, r.color  FROM ".self::BUSINROUTE_TABLE_NAME." bir
 INNER JOIN ".self::BUS_TABLE_NAME." b ON b.id = bir.bus_id
 INNER JOIN ".self::ROUTE_TABLE_NAME." r ON r.id = bir.route_id
 INNER JOIN ".self::BUSLOCATION_TABLE_NAME." bl ON b.id = bl.bus_id
@@ -116,10 +115,10 @@ ORDER BY bir.bus_id";
   }
   //Mode 5
   public function GetSpecificBusLocation($bus_id){
-    $querystring = "SELECT bus_id,latitude,longitude,timestamp FROM ".self::BUSLOCATION_TABLE_NAME." bl1 
+    $querystring = "SELECT bus_id,step,latitude,longitude,timestamp FROM ".self::BUSLOCATION_TABLE_NAME." bl1 
                     WHERE bus_id = {$bus_id} AND timestamp = (SELECT MAX(timestamp) FROM ".self::BUSLOCATION_TABLE_NAME." bl2 WHERE bl1.bus_id = bl2.bus_id)
                     LIMIT 1";
-    $result = $this->Query($querystring);
+    $result = $this->SingleQuery($querystring);
     return $result; //Query PASS
   }
   
@@ -201,9 +200,6 @@ ORDER BY bir.bus_id";
     
     //POST: Insert/Update Car Function
     public function UpdateBusData($data){
-      $isBusExist = $this->CheckBusExist($data->bus_id);
-      echo("isBusExist".$isBusExist);
-      if($isBusExist){
         $isBusLocationExist = $this->CheckBusLocationExist($data->bus_id);
         echo("isBusLocationExist".$isBusLocationExist);
         if($isBusLocationExist){
@@ -215,39 +211,24 @@ ORDER BY bir.bus_id";
           $result = $this->InsertBusDataQuery($data);
         }
         return $result;
-      }
-      else{
-        throw new Error("Bus not exist in system.");
-      }
     }
     
     private function InsertBusDataQuery($data){
-      $querystring = "INSERT INTO ".self::BUSLOCATION_TABLE_NAME." (bus_id,latitude,longitude,speed,course,is_active)
-      VALUES ({$data->bus_id},{$data->latitude},{$data->longitude},{$data->speed},{$data->course},1)";
+      $querystring = "INSERT INTO ".self::BUSLOCATION_TABLE_NAME." (bus_id,latitude,longitude,speed,course,step,is_active)
+      VALUES ({$data->bus_id},{$data->latitude},{$data->longitude},{$data->speed},{$data->course},{$data->step},1)";
       $result = $this->NonFetchQuery($querystring);
       return $result;
     }
     private function UpdateBusDataQuery($data){
+      echo "QUERY DATA SET";
+      var_dump($data);
       $querystring = "UPDATE ".self::BUSLOCATION_TABLE_NAME." 
-                      SET latitude = {$data->latitude}, longitude = {$data->longitude}, is_active = 1, speed = {$data->speed}, course ={$data->course}
-                      WHERE bus_id = {$data->bus_id}";
+      SET latitude = {$data->latitude}, longitude = {$data->longitude}, is_active = 1, step = {$data->step}, speed = {$data->speed}, course = {$data->course}
+      WHERE bus_id = {$data->bus_id}";
       $result = $this->NonFetchQuery($querystring);
       return $result;
       
     }
-    //Mode FnTest
-    private function CheckBusExist($bus_id){
-      $querystring = "SELECT id FROM ".self::BUS_TABLE_NAME." 
-      WHERE id = {$bus_id} LIMIT 1";
-      $result = $this->GetRowCount($querystring);
-      if($result){
-        return true;
-      }
-      else{
-        return false;
-      }
-    }
-  
     private function CheckBusLocationExist($bus_id){
       $querystring = "SELECT bus_id FROM ".self::BUSLOCATION_TABLE_NAME."
                       WHERE bus_id = {$bus_id} LIMIT 1";
@@ -258,6 +239,25 @@ ORDER BY bir.bus_id";
       else{
         return false;
       }
+    }
+
+    //Internal Usage
+    public function _FindWaypoint($bus_id){
+      $querystring = "SELECT route_id FROM ".self::BUSINROUTE_TABLE_NAME."
+                      WHERE bus_id = {$bus_id}";
+                      //JOIN busID with routeID then get step from that route
+      $routeID = $this->SingleQuery($querystring);
+      $waypointsData = $this->_GetWaypointInRouteMinimal($routeID->route_id);
+      return $waypointsData;
+    }
+    private function _GetWaypointInRouteMinimal($route_id){
+      //route in query will be removed later because this info is not needed.
+      $querystring = "SELECT step, station_id, wp.route_id, s.latitude, s.longitude FROM ".self::WAYPOINT_TABLE_NAME." as wp
+      INNER JOIN ".self::ROUTE_TABLE_NAME." as r ON wp.route_id = r.id
+      INNER JOIN ".self::STATION_TABLE_NAME." as s ON wp.station_id = s.id
+      WHERE route_id = {$route_id} ORDER BY step";
+      $result = $this->Query($querystring);
+      return $result;
     }
   }
   ?>
