@@ -93,7 +93,7 @@ ORDER BY b.id";
   //Bus Location
   //Mode 3
   public function GetAllRecentBusLocation(){
-    $querystring = "SELECT bir.bus_id, bir.route_id, r.name as route_name, r.description, b.plate, bl.is_active, bl.latitude, bl.longitude, bl.speed, bl.timestamp, r.color  FROM ".self::BUSINROUTE_TABLE_NAME." bir
+    $querystring = "SELECT bir.bus_id, bir.route_id, step, bl.course, r.name as route_name, r.description, b.plate, bl.is_active, bl.latitude, bl.longitude, bl.speed, bl.timestamp, r.color  FROM ".self::BUSINROUTE_TABLE_NAME." bir
 INNER JOIN ".self::BUS_TABLE_NAME." b ON b.id = bir.bus_id
 INNER JOIN ".self::ROUTE_TABLE_NAME." r ON r.id = bir.route_id
 INNER JOIN ".self::BUSLOCATION_TABLE_NAME." bl ON b.id = bl.bus_id
@@ -104,7 +104,7 @@ ORDER BY bir.bus_id,bir.route_id";
   }
   //Mode 4
   public function GetRecentBusLocationInRoute($route_id){
-    $querystring = "SELECT bir.bus_id, bir.route_id, step,  r.name as route_name, r.description, b.plate, bl.is_active, bl.latitude, bl.longitude, bl.speed, bl.timestamp, r.color  FROM ".self::BUSINROUTE_TABLE_NAME." bir
+    $querystring = "SELECT bir.bus_id, bir.route_id, step, bl.course, r.name as route_name, r.description, b.plate, bl.is_active, bl.latitude, bl.longitude, bl.speed, bl.timestamp, r.color  FROM ".self::BUSINROUTE_TABLE_NAME." bir
 INNER JOIN ".self::BUS_TABLE_NAME." b ON b.id = bir.bus_id
 INNER JOIN ".self::ROUTE_TABLE_NAME." r ON r.id = bir.route_id
 INNER JOIN ".self::BUSLOCATION_TABLE_NAME." bl ON b.id = bl.bus_id
