@@ -158,7 +158,7 @@ ORDER BY bir.bus_id";
   //Waypoint
   //Mode 10
   public function GetWaypointInRoute($route_id){
-    $querystring = "SELECT step,station_id,wp.route_id,r.name as route_name,r.description as route_description,s.name as station_name,s.latitude,s.longitude FROM ".self::WAYPOINT_TABLE_NAME." as wp
+    $querystring = "SELECT step,station_id,wp.route_id,r.name as route_name,r.description as route_description,s.name as station_name,s.latitude,s.longitude,r.color FROM ".self::WAYPOINT_TABLE_NAME." as wp
     INNER JOIN ".self::ROUTE_TABLE_NAME." as r ON wp.route_id = r.id
     INNER JOIN ".self::STATION_TABLE_NAME." as s ON wp.station_id = s.id
     WHERE route_id = {$route_id} ORDER BY step";
@@ -167,7 +167,7 @@ ORDER BY bir.bus_id";
   }
   //Mode 11
   public function GetWaypointAll(){
-    $querystring = "SELECT step,station_id,route_id,r.name as route_name,r.description as route_description,s.name as station_name,s.latitude,s.longitude FROM ".self::WAYPOINT_TABLE_NAME." as wp
+    $querystring = "SELECT step,station_id,route_id,r.name as route_name,r.description as route_description,s.name as station_name,s.latitude,s.longitude,r.color FROM ".self::WAYPOINT_TABLE_NAME." as wp
     INNER JOIN ".self::ROUTE_TABLE_NAME." as r ON wp.route_id = r.id
     INNER JOIN ".self::STATION_TABLE_NAME." as s ON wp.station_id = s.id
     ORDER BY route_id, step";
