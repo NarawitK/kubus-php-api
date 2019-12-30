@@ -1,5 +1,5 @@
 <?php
-require_once './helpers/calcdist.php';
+require_once '../helpers/calcdist.php';
 
 function AddStepToArduinoPOST($arduino_json, $queryWaypoints, $queryBusLocationInDB){
     $next_step = null;
@@ -7,6 +7,8 @@ function AddStepToArduinoPOST($arduino_json, $queryWaypoints, $queryBusLocationI
     $busDataFromArduino = $arduino_json;
     $waypoints = $queryWaypoints;
     $currentBusLocationInDB = $queryBusLocationInDB;
+    echo "CheckDB";
+    var_dump($currentBusLocationInDB);
     $currentStep = $currentBusLocationInDB->step;
     $next_step = AssignNextStep($currentStep, $waypoints);
 
@@ -50,7 +52,7 @@ function AddStepToArduinoPOST($arduino_json, $queryWaypoints, $queryBusLocationI
       $next_step = $filteredWaypoints[0]->step;
     }
     else{
-      $next_step = $filteredWaypoints[($currentStepInDB)]->step;
+      $next_step = $filteredWaypoints[$currentStepInDB]->step;
     }
     return $next_step;
   }

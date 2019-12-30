@@ -1,6 +1,6 @@
 <?php
-require "../core/database/bootstrap.php";
-require "./helpers/stepadder.php";
+require "./core/database/bootstrap.php";
+require "../helpers/stepadder.php";
 
   $json = file_get_contents('php://input');
   $utf_json = utf8_encode($json); 
