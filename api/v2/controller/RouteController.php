@@ -25,7 +25,7 @@ class RouteController {
     {
         switch ($this->requestMethod) {
             case 'GET':
-                if ($this->Id || $this->Id === 0) {
+                if ($this->Id) {
                     $response = $this->getRoute($this->Id);
                 } else {
                     $response = $this->getAllRoutes();

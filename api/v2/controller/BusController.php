@@ -25,7 +25,7 @@ class BusController {
     {
         switch ($this->requestMethod) {
             case 'GET':
-                if ($this->busId || $this->busId === 0) {
+                if ($this->busId) {
                     $response = $this->getBus($this->busId);
                 } else {
                     $response = $this->getAllBuses();

@@ -9,6 +9,7 @@ require_once "./controller/BusLocationInRouteController.php";
 require_once "./controller/device/DeviceUpdateLocation.php";
 require_once "./controller/extras/StationInRouteController.php";
 require_once "./controller/extras/RouteInStationController.php";
+require_once "./controller/extras/WaypointInRouteController.php";
 
 use Controller\BusController;
 use Controller\BusLocationController;
@@ -19,6 +20,7 @@ use Controller\StationController;
 use Controller\WaypointController;
 use Controller\Extras\StationInRouteController;
 use Controller\Extras\RouteInStationController;
+use Controller\Extras\WaypointInRouteController;
 //use whatever it necessary to fetch data.
 
 header("Access-Control-Allow-Origin: *");
@@ -45,6 +47,11 @@ switch ($uri[4]){
         $controller = new BusLocationController($dbConnection, $requestMethod, $inputId);
         $controller->processRequest();
         break;
+	case "buslocation-in-route":
+		$inputId = CheckId($uri);
+        $controller = new BusLocationInRouteController($dbConnection, $requestMethod, $inputId);
+        $controller->processRequest();
+		break;
     case "route": //pass
         $inputId = CheckId($uri);
         $controller = new RouteController($dbConnection, $requestMethod, $inputId);
@@ -58,6 +65,11 @@ switch ($uri[4]){
     case "waypoint": //pass
         $inputId = CheckId($uri);
         $controller = new WaypointController($dbConnection, $requestMethod, $inputId);
+        $controller->processRequest();
+        break;
+    case "waypoint-in-route":
+        $inputId = CheckId($uri);
+        $controller = new WaypointInRouteController($dbConnection, $requestMethod, $inputId);
         $controller->processRequest();
         break;
     case "station-in-route": //pass

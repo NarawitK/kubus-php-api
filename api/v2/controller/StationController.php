@@ -25,7 +25,7 @@ class StationController {
     {
         switch ($this->requestMethod) {
             case 'GET':
-                if ($this->Id || $this->Id === 0) {
+                if ($this->Id) {
                     $response = $this->getStation($this->Id);
                 }
                 else{
