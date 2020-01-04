@@ -28,8 +28,13 @@ class DeviceUpdateLocationModel {
     public function insert($id, object $input){
         try{
             $input_data = $this->prepareStep($id, $input);
-            $result = $this->queryBuilder->InsertBusDataQuery($id, $input_data);
-            return $result;
+            if($input_data){
+                $result = $this->queryBuilder->InsertBusDataQuery($id, $input_data);
+                return $result;
+            }
+            else{
+                return false;
+            }
         }
         catch(\PDOException $e){
             exit($e->getMessage());
@@ -39,8 +44,13 @@ class DeviceUpdateLocationModel {
     public function update($id, object $input){
         try{
             $input_data = $this->prepareStep($id, $input);
-            $result = $this->queryBuilder->UpdateBusDataQuery($id, $input_data);
-            return $result;
+            if($input_data){
+                $result = $this->queryBuilder->UpdateBusDataQuery($id, $input_data);
+                return $result;
+            }
+            else{
+                return false;
+            }
         }
         catch(\PDOException $e){
             exit($e->getMessage());
@@ -50,7 +60,13 @@ class DeviceUpdateLocationModel {
         $input_data = $input;
         $waypoint = $this->queryBuilder->_FindWaypoint($id);
         $busLocationInRecord = $this->queryBuilder->GetRecentBusLocation($id);
-        $input_data->step = AddStepToArduinoPOST($input_data, $waypoint, $busLocationInRecord);
-        return $input_data;
+        if($busLocationInRecord){
+            $input_data->step = AddStepToArduinoPOST($input_data, $waypoint, $busLocationInRecord);
+            return $input_data;
+        }
+        else{
+            return false;
+        }
+        
     }
 }

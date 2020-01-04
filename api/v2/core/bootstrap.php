@@ -2,5 +2,7 @@
 require "./core/DBConnector.php";
 use Core\DatabaseConnector;
 
-$dbConnection = (new DatabaseConnector())->getConnection();
+$config = require "./core/config.php";
+$dbConnection = (new DatabaseConnector($config['database']))->getConnection();
+
 ?>

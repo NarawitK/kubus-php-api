@@ -7,8 +7,6 @@ function AddStepToArduinoPOST($arduino_json, $queryWaypoints, $queryBusLocationI
     $busDataFromArduino = $arduino_json;
     $waypoints = $queryWaypoints;
     $currentBusLocationInDB = $queryBusLocationInDB;
-    echo "CheckDB";
-    var_dump($currentBusLocationInDB);
     $currentStep = $currentBusLocationInDB->step;
     $next_step = AssignNextStep($currentStep, $waypoints);
 
@@ -25,12 +23,10 @@ function AddStepToArduinoPOST($arduino_json, $queryWaypoints, $queryBusLocationI
     $coordinate =  (object)array( "latitude" => $deviceLat, "longitude" => $deviceLng);
     $closestStation = CompareDistancesWithStep($coordinate, $filteredWaypoint, $currentStep);
     $closestStep = $closestStation->closest->step;
-    echo "<br/>closestStep: {$closestStep}<br/>";
     if($closestStep !== $currentStep && $closestStep !== $nextStep){
       return $closestStep;
     }
     else{
-      echo "Still in order <br/>";
       return false;
     }
   }

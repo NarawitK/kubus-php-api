@@ -203,11 +203,11 @@ ORDER BY bir.bus_id";
         $isBusLocationExist = $this->CheckBusLocationExist($data->bus_id);
         echo("isBusLocationExist".$isBusLocationExist);
         if($isBusLocationExist){
-          echo('Go Update');
+          echo('Update');
           $result = $this->UpdateBusDataQuery($data); 
         }
         else{
-          echo('Go Insert');
+          echo('Insert');
           $result = $this->InsertBusDataQuery($data);
         }
         return $result;

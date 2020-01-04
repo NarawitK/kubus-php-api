@@ -25,8 +25,8 @@ use Controller\Extras\WaypointInRouteController;
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
-header("Access-Control-Max-Age: 3600");
+header("Access-Control-Allow-Methods: GET,POST,PUT,DELETE");
+header("Access-Control-Max-Age: 60");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -72,20 +72,23 @@ switch ($uri[4]){
         $controller = new WaypointInRouteController($dbConnection, $requestMethod, $inputId);
         $controller->processRequest();
         break;
-    case "station-in-route": //pass
+    case "routes-in-station": //pass
         $inputId = CheckId($uri);
         $controller = new StationInRouteController($dbConnection, $requestMethod, $inputId);
         $controller->processRequest();
         break;
-    case "route-in-station":
+		/*
+    case "routes-in-station":
         $inputId = CheckId($uri);
         $controller = new RouteInStationController($dbConnection, $requestMethod, $inputId);
         $controller->processRequest();
         break;
-    case "gps-update-location":
+		*/
+    case "device-location-update":
         $inputId = CheckId($uri);
         $controller = new DeviceUpdateLocationController($dbConnection, $requestMethod, $inputId);
         $controller->processRequest();
+        break;
     default:
         header("HTTP/1.1 404 Not Found");
         exit();
@@ -96,9 +99,13 @@ switch ($uri[4]){
 
 function CheckId($uri){
     $Id = null;
-    if(isset($uri[5])){
+    if(isset($uri[5]) && is_numeric($uri[5])){
         $Id = (int)$uri[5];
     }
-    return $Id;
+	else if(isset($uri[5]) && is_string($uri[5])){
+		header("HTTP/1.1 404 Not Found");
+        exit();
+	}
+	return $Id;
 }
 ?>

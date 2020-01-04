@@ -432,19 +432,21 @@ ORDER BY bir.bus_id";
 
     //Arduino Usage
     //POST: Insert/Update Car Function
+
+    /*
     public function UpdateBusData($data)
     {
         $isBusLocationExist = $this->CheckBusLocationExist($data->bus_id);
-        echo ("isBusLocationExist" . $isBusLocationExist);
         if ($isBusLocationExist) {
-            echo ('Go Update');
+            //echo ('Go Update');
             $result = $this->UpdateBusDataQuery($data);
         } else {
-            echo ('Go Insert');
+            //echo ('Go Insert');
             $result = $this->InsertBusDataQuery($data);
         }
         return $result;
     }
+    */
     public function InsertBusDataQuery($id, $data)
     {
         $statement = "INSERT INTO " . self::BUSLOCATION_TABLE_NAME . " (bus_id,latitude,longitude,speed,course,step,is_active)
@@ -455,7 +457,7 @@ ORDER BY bir.bus_id";
     public function UpdateBusDataQuery($id, $data)
     {
         $statement = "UPDATE " . self::BUSLOCATION_TABLE_NAME . "
-        SET latitude = {$data->latitude}, longitude = {$data->longitude}, is_active = 1, step = {$data->step}, speed = {$data->speed}, course = {$data->course}
+        SET latitude = {$data->latitude}, longitude = {$data->longitude}, speed = {$data->speed}, course = {$data->course},step = {$data->step}, is_active = 1
         WHERE bus_id = {$id}";
         $result = $this->NonFetchQuery($statement);
         return $result;

@@ -5,22 +5,21 @@ class DatabaseConnector {
 
     private $dbConnection = null;
 
-    public function __construct()
+    public function __construct($config)
     {
-        $host = "localhost";
-        $port = "3306";
-        $db   = "kubus";
-        $user = "root";
-        $pass = "";
+        $host = $config['connection'];
+        $port = $config["port"];
+        $db   = $config["databaseName"];
+        $user = $config["username"];
+        $pass = $config["password"];
+        $options = $config['options'];
 
         try {
             $this->dbConnection = new \PDO(
                 "mysql:host=$host;port=$port;charset=utf8;dbname=$db",
                 $user,
                 $pass,
-                [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-                \PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
-                \PDO::ATTR_EMULATE_PREPARES => false]
+                $options
                 
             );
         } catch (\PDOException $e) {

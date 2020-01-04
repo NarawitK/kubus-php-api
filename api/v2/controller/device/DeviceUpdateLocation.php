@@ -46,9 +46,18 @@ class DeviceUpdateLocationController {
             return $this->unprocessableEntityResponse();
         }
         $result = $this->deviceUpdateLocationModel->insert($id, $input);
-        $response['status_code_header'] = 'HTTP/1.1 201 Created';
-        $response['body'] = null;
-        return $response;
+        if($result){
+            var_dump($result);
+            $response['status_code_header'] = 'HTTP/1.1 201 Created';
+            $response['body'] = null;
+            return $response;
+        }
+        /*
+        else{
+            echo "!result";
+            return $this->notFoundResponse();
+        }
+        */
     }
 
     private function UpdateBusLocationFromDevice($id)
@@ -62,13 +71,15 @@ class DeviceUpdateLocationController {
             return $this->unprocessableEntityResponse();
         }
         $this->deviceUpdateLocationModel->update($id, $input);
+        if(!$result){
+            return $this->notFoundResponse();
+        }
         $response['status_code_header'] = 'HTTP/1.1 200 OK';
         $response['body'] = null;
         return $response;
     }
 
     private function validateDevicePOSTData($input){
-        var_dump($input);
         if (!isset($input->latitude, $input->longitude, $input->course, $input->speed)) {
             return false;
         }

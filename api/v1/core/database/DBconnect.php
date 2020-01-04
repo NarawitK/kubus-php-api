@@ -1,6 +1,4 @@
 <?php
-require 'config.php';
-
 class DBConnect
 {
   public static function makeCon($config){
