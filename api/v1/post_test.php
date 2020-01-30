@@ -1,11 +1,13 @@
 <?php
-
-$post_data->postmode = "p1";
-$post_data->bus_id = 98;
-$post_data->latitude = 14.00667;
-$post_data->longitude = 99.97719;
-$post_data->speed = 200.01;
-$post_data->course = 5822;
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+//$post_data->postmode = "p1";
+$post_data->bus_id = 999;
+$post_data->latitude = 0;
+$post_data->longitude = 0;
+$post_data->speed = 0.1456;
+$post_data->course = 84.39;
 $encode_postdata = json_encode($post_data);
 
 $data = json_decode($encode_postdata);

@@ -1,26 +1,47 @@
 <?php
-require "./core/database/bootstrap.php";
-require "../helpers/stepadder.php";
+require './core/database/bootstrap.php';
+require '../helpers/stepadder.php';
 
-  $json = file_get_contents('php://input');
-  $utf_json = utf8_encode($json); 
-  $dataset = json_decode($utf_json);
-  $postmode = $dataset->postmode;
+  $json = file_get_contents('php://input'); 
+  $dataset = json_decode($json);
+  
    try{
-     switch($postmode){
-       case "p1":
+      $waypoints = $app['database']->_FindWaypoint($dataset->bus_id);
+      $currentBusLocationInDB = $app['database']->GetSpecificBusLocation($dataset->bus_id);
+      $dataset->step = AddStepToArduinoPOST($dataset,$waypoints,$currentBusLocationInDB);
+      /*
+      echo '<br/>Step ฉันคิส<br/>';
+      var_dump($dataset);
+      echo '<br/>'; 
+      /* Temporary Disable for debugging. */
+      $result = $app['database']->UpdateBusData($dataset);
+      if($result){
+        header("HTTP/1.1 200 OK");
+      } 
+
+   }
+   catch(Exception $e){
+     echo($e);
+   }
+
+   /*
+      $postmode = $dataset->postmode;
+         switch($postmode){
+      case "p1":
         $waypoints = $app['database']->_FindWaypoint($dataset->bus_id);
         $currentBusLocationInDB = $app['database']->GetSpecificBusLocation($dataset->bus_id);
         $dataset->step = AddStepToArduinoPOST($dataset,$waypoints,$currentBusLocationInDB);
         $result = $app['database']->UpdateBusData($dataset);
         echo $result;
-        break;
+      break;
+      case "auto":
+        $waypoints = $app['database']->_FindWaypoint($dataset->bus_id);
+        $currentBusLocationInDB = $app['database']->GetSpecificBusLocation($dataset->bus_id);
+        $dataset->step = AddStepToArduinoPOST($dataset,$waypoints,$currentBusLocationInDB);
+        $result = $app['database']->UpdateBusData($dataset);
+      break;
        default:
         throw new error("Update Error");
-        break;
-     }
-   }
-   catch(Exception $e){
-     echo($e);
-   }
+      break;
+    */
 ?>

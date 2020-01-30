@@ -1,32 +1,41 @@
 <?php
 require_once '../helpers/calcdist.php';
 
+/*
+* Most of comments in this section  = debugging.
+* Summary: Need to test Double Step station. / [PASS] Nearby step / [PASS] Std. Case.
+*/
+
 function AddStepToArduinoPOST($arduino_json, $queryWaypoints, $queryBusLocationInDB){
     $next_step = null;
     $currentStep = null;
     $busDataFromArduino = $arduino_json;
     $waypoints = $queryWaypoints;
-    $currentBusLocationInDB = $queryBusLocationInDB;
-    $currentStep = $currentBusLocationInDB->step;
+    $currentStep = $queryBusLocationInDB->step;
     $next_step = AssignNextStep($currentStep, $waypoints);
-
-    $checkResult = InitCheckStepOutOfOrder($waypoints,$currentStep,$next_step,$busDataFromArduino->latitude,$busDataFromArduino->longitude);
-    if($checkResult == false){
+    /*
+    echo 'Current: '.$currentStep;
+    echo 'Next: '.$next_step;
+    */
+    $checkerResult = InitCheckStepOutOfOrder($waypoints,$currentStep,$next_step,$busDataFromArduino->latitude,$busDataFromArduino->longitude);
+    if(!$checkerResult){
       return FindNextStep($busDataFromArduino, $waypoints, $currentStep, $next_step);
     }
     else{
-      return $checkResult;
+      return $checkerResult;
     }
   }
 
   function InitCheckStepOutOfOrder($filteredWaypoint, $currentStep, $nextStep, $deviceLat, $deviceLng){
     $coordinate =  (object)array( "latitude" => $deviceLat, "longitude" => $deviceLng);
-    $closestStation = CompareDistancesWithStep($coordinate, $filteredWaypoint, $currentStep);
+    $closestStation = CompareDistancesWithDuplication($coordinate, $filteredWaypoint, $currentStep, $nextStep);
     $closestStep = $closestStation->closest->step;
     if($closestStep !== $currentStep && $closestStep !== $nextStep){
+      //echo 'OUT';
       return $closestStep;
     }
     else{
+      //echo 'IN';
       return false;
     }
   }
@@ -41,6 +50,7 @@ function AddStepToArduinoPOST($arduino_json, $queryWaypoints, $queryBusLocationI
     }
   } 
 
+  //Assign comparable next step
   function AssignNextStep($currentStepInDB, $filteredWaypoints){
     $next_step = null;
     $maxWaypointsCount = count($filteredWaypoints);
@@ -55,9 +65,11 @@ function AddStepToArduinoPOST($arduino_json, $queryWaypoints, $queryBusLocationI
 
   function CheckNextStepProximity($NextStepDistanceData){
     if($NextStepDistanceData->distance <= 50){
+      //echo 'In Prox';
       return true;
     }
     else{
+      //echo 'No Prox';
       return false;
     }
   }

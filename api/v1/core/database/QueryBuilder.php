@@ -201,29 +201,24 @@ ORDER BY bir.bus_id";
     //POST: Insert/Update Car Function
     public function UpdateBusData($data){
         $isBusLocationExist = $this->CheckBusLocationExist($data->bus_id);
-        echo("isBusLocationExist".$isBusLocationExist);
         if($isBusLocationExist){
-          echo('Update');
           $result = $this->UpdateBusDataQuery($data); 
         }
         else{
-          echo('Insert');
           $result = $this->InsertBusDataQuery($data);
         }
         return $result;
     }
     
     private function InsertBusDataQuery($data){
-      $querystring = "INSERT INTO ".self::BUSLOCATION_TABLE_NAME." (bus_id,latitude,longitude,speed,course,step,is_active)
-      VALUES ({$data->bus_id},{$data->latitude},{$data->longitude},{$data->speed},{$data->course},{$data->step},1)";
+      $querystring = "INSERT INTO ".self::BUSLOCATION_TABLE_NAME." (bus_id,latitude,longitude,step,is_active,course,speed)
+      VALUES ({$data->bus_id},{$data->latitude},{$data->longitude},{$data->step},1,{$data->course},{$data->speed})";
       $result = $this->NonFetchQuery($querystring);
       return $result;
     }
     private function UpdateBusDataQuery($data){
-      echo "QUERY DATA SET";
-      var_dump($data);
       $querystring = "UPDATE ".self::BUSLOCATION_TABLE_NAME." 
-      SET latitude = {$data->latitude}, longitude = {$data->longitude}, is_active = 1, step = {$data->step}, speed = {$data->speed}, course = {$data->course}
+      SET latitude = {$data->latitude}, longitude = {$data->longitude}, step = {$data->step}, is_active = 1, course = {$data->course}, speed = {$data->speed}
       WHERE bus_id = {$data->bus_id}";
       $result = $this->NonFetchQuery($querystring);
       return $result;
