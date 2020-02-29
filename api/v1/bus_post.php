@@ -9,10 +9,6 @@ require '../helpers/stepadder.php';
       $waypoints = $app['database']->_FindWaypoint($dataset->bus_id);
       $currentBusLocationInDB = $app['database']->GetSpecificBusLocation($dataset->bus_id);
       $dataset->step = AddStepToArduinoPOST($dataset,$waypoints,$currentBusLocationInDB);
-      /*
-      echo '<br/>Step ฉันคิส<br/>';
-      var_dump($dataset);
-      echo '<br/>'; 
       /* Temporary Disable for debugging. */
       $result = $app['database']->UpdateBusData($dataset);
       if($result){

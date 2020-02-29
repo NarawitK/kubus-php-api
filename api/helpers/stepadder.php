@@ -13,10 +13,6 @@ function AddStepToArduinoPOST($arduino_json, $queryWaypoints, $queryBusLocationI
     $waypoints = $queryWaypoints;
     $currentStep = $queryBusLocationInDB->step;
     $next_step = AssignNextStep($currentStep, $waypoints);
-    /*
-    echo 'Current: '.$currentStep;
-    echo 'Next: '.$next_step;
-    */
     $checkerResult = InitCheckStepOutOfOrder($waypoints,$currentStep,$next_step,$busDataFromArduino->latitude,$busDataFromArduino->longitude);
     if(!$checkerResult){
       return FindNextStep($busDataFromArduino, $waypoints, $currentStep, $next_step);
