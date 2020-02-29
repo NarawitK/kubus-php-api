@@ -247,7 +247,7 @@ ORDER BY bir.bus_id";
     //Mode 6
     public function GetAllStation()
     {
-        $statement = "SELECT * FROM " . self::STATION_TABLE_NAME;
+        $statement = "SELECT id AS station_id,name AS station_name, latitude, longitude FROM " . self::STATION_TABLE_NAME;
         $result = $this->Query($statement);
         return $result; //Query Pass (Mod Route Later)
     }
@@ -288,10 +288,10 @@ ORDER BY bir.bus_id";
     /*
     //Mode 7
     public function GetStationInRoute($route_id){
-    $statement = "SELECT wp.station_id, wp.step, wp.route_id, r.name as route_name, r.description as route_description, s.name as station_name, s.latitude, s.longitude FROM ".self::WAYPOINT_TABLE_NAME." as wp
+$statement = "SELECT DISTINCT wp.station_id, wp.route_id, r.name as route_name, r.description as route_description, s.name as station_name, s.latitude, s.longitude FROM ".self::WAYPOINT_TABLE_NAME." as wp
     INNER JOIN ".self::ROUTE_TABLE_NAME." as r ON wp.route_id = r.id
     INNER JOIN ".self::STATION_TABLE_NAME." as s ON wp.station_id = s.id
-    WHERE route_id = {$route_id} ORDER BY wp.step";
+    WHERE route_id = {$route_id} ORDER BY wp.station_id";
     $result = $this->Query($statement);
     return $result; //Query Pass
     }
