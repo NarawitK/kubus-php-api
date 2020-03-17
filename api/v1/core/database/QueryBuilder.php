@@ -125,7 +125,7 @@ ORDER BY bir.bus_id";
   //Station
   //Mode 6
   public function GetAllStation(){
-    $querystring = "SELECT id AS station_id,name AS station_name, latitude, longitude FROM ".self::STATION_TABLE_NAME;
+    $querystring = "SELECT id AS station_id, name AS station_name, latitude, longitude FROM ".self::STATION_TABLE_NAME;
     $result = $this->Query($querystring);
     return $result; //Query Pass (Mod Route Later)
   }
