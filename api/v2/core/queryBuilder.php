@@ -408,7 +408,7 @@ $statement = "SELECT DISTINCT wp.station_id, wp.route_id, r.name as route_name, 
     //Mode 12
     public function GetRouteInStation($station_id)
     {
-        $statement = "SELECT DISTINCT r.id as routeID, r.name as routeName, r.description as routeDescription FROM " . self::WAYPOINT_TABLE_NAME . " as wp
+        $statement = "SELECT DISTINCT r.id as route_id, r.name as route_name, r.description as route_description FROM " . self::WAYPOINT_TABLE_NAME . " as wp
       INNER JOIN " . self::ROUTE_TABLE_NAME . " as r ON wp.route_id = r.id
       INNER JOIN " . self::STATION_TABLE_NAME . " as s ON wp.station_id = s.id
       WHERE s.id = {$station_id}
@@ -420,7 +420,7 @@ $statement = "SELECT DISTINCT wp.station_id, wp.route_id, r.name as route_name, 
     //Mode 13
     public function GetRouteAndStationDataForQRCode($station_id)
     {
-        $statement = "SELECT DISTINCT r.id AS routeID, r.name AS routeName, r.description AS routeDescription, s.id AS stationID, s.name AS stationName, s.latitude, s.longitude
+        $statement = "SELECT DISTINCT r.id AS route_id, r.name AS route_name, r.description AS route_description, s.id AS station_id, s.name AS station_name, s.latitude, s.longitude
       FROM " . self::WAYPOINT_TABLE_NAME . " AS wp
       INNER JOIN " . self::ROUTE_TABLE_NAME . " AS r ON wp.route_id = r.id
       INNER JOIN " . self::STATION_TABLE_NAME . " AS s ON wp.station_id = s.id
